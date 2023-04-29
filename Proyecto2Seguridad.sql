@@ -200,19 +200,19 @@ Salida:
 	Devuelve un conjunto de resultados con las películas que coincidan con el título.
 */
 CREATE OR REPLACE FUNCTION search_movie(p_title VARCHAR)
-RETURNS SETOF public.film
+RETURNS TABLE (film_id INT, title VARCHAR, description TEXT, release_year YEAR)
 AS $$
 BEGIN
     -- Busca las películas que coincidan con el título.
     RETURN QUERY
-    SELECT *
+    SELECT public.film.film_id, public.film.title, public.film.description, public.film.release_year
     FROM public.film
-    WHERE title ILIKE '%' || p_title || '%';
+    WHERE public.film.title ILIKE '%' || p_title || '%';
 END;
 $$ LANGUAGE plpgsql;
 
 -- Ejemplo de uso
-SELECT * FROM search_movie('Star');
+SELECT * FROM search_movie('Action');
 
 
 -- Crea el rol EMP
