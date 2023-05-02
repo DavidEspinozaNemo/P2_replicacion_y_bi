@@ -13,6 +13,8 @@ CREATE TABLE ME_STORE(
 
 CREATE TABLE ME_TIME(
 	id_time INT,
+	fecha date NOT NULL,
+	_day NUMERIC(2) NOT NULL,
 	_mounth NUMERIC(2) NOT NULL,
 	_year NUMERIC(4) NOT NULL,
 	PRIMARY KEY (id_time)
@@ -96,8 +98,9 @@ RETURNS VOID AS $$
 DECLARE
   numero_error NUMERIC := 123;
 BEGIN
-	INSERT INTO me_time (id_time, _mounth, _year)
-		SELECT rt.rental_id, extract(month from rt.return_date), extract(year from rt.return_date)
+	INSERT INTO me_time (id_time, fecha, _day, _mounth, _year)
+		SELECT rt.rental_id, rt.return_date ,extract(day from rt.return_date),
+		  extract(month from rt.return_date), extract(year from rt.return_date)
 		FROM rental as rt
 		WHERE rt.return_date IS NOT NULL
 		AND NOT EXISTS (
@@ -157,8 +160,9 @@ select insert_data_actor();
 select insert_data_rental();
 
 -- las ventas por mes
-select sum(me_rental.amount), me_time._mounth
+select sum(me_rental.amount), me_time._mounth, me_time.fecha
 	from me_rental 
 	inner join me_time on me_rental.id_time = me_time.id_time
-	group by me_time._mounth
-	order by me_time._mounth;
+	group by me_time._mounth, me_time.fecha
+	order by me_time._mounth, me_time.fecha;
+	
